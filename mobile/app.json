@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "FoodBook",
+    "slug": "foodbook",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "foodbook",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF8F3"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "ro.foodbook.app"
+    },
+    "android": {
+      "package": "ro.foodbook.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#FFF8F3"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "FoodBook are nevoie de acces la poze ca sa poti publica retete.",
+          "cameraPermission": "FoodBook are nevoie de camera ca sa poti fotografia preparatul."
+        }
+      ]
+    ]
+  }
+}

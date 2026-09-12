@@ -1,0 +1,241 @@
+// FoodBook - schema Etapa 1
+// Imaginile stau in Supabase Storage; aici pastram doar object key-ul.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String  @id @default(uuid()) @db.Uuid
+  username     String  @unique @db.VarChar(24)
+  displayName  String  @map("display_name") @db.VarChar(60)
+  email        String  @unique @db.VarChar(254)
+  passwordHash String  @map("password_hash")
+  avatarKey    String? @map("avatar_key")
+  bio          String? @db.VarChar(300)
+
+  // contoare denormalizate - evita COUNT(*) per card in feed
+  recipesCount   Int @default(0) @map("recipes_count")
+  followersCount Int @default(0) @map("followers_count")
+  followingCount Int @default(0) @map("following_count")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  recipes       Recipe[]
+  refreshTokens RefreshToken[]
+  likes         RecipeLike[]
+  comments      Comment[]
+  savedRecipes  SavedRecipe[]
+  following     Follow[]       @relation("Follower")
+  followers     Follow[]       @relation("Following")
+  notifications Notification[] @relation("NotificationRecipient")
+  actions       Notification[] @relation("NotificationActor")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  tokenHash  String    @unique @map("token_hash")
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz(6)
+  deviceInfo String?   @map("device_info") @db.VarChar(200)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model Recipe {
+  id          String  @id @default(uuid()) @db.Uuid
+  userId      String  @map("user_id") @db.Uuid
+  title       String? @db.VarChar(140)
+  description String?
+  prepMinutes Int?    @map("prep_minutes")
+  servings    Int?
+  categoryId  Int?    @map("category_id")
+
+  likesCount    Int @default(0) @map("likes_count")
+  commentsCount Int @default(0) @map("comments_count")
+  savesCount    Int @default(0) @map("saves_count")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  author        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category      Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  images        RecipeImage[]
+  ingredients   Ingredient[]
+  instructions  Instruction[]
+  likes         RecipeLike[]
+  comments      Comment[]
+  savedBy       SavedRecipe[]
+  notifications Notification[]
+
+  @@index([createdAt(sort: Desc), id(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([categoryId, createdAt(sort: Desc)])
+  @@map("recipes")
+}
+
+model RecipeImage {
+  id        String @id @default(uuid()) @db.Uuid
+  recipeId  String @map("recipe_id") @db.Uuid
+  objectKey String @map("object_key")
+  width     Int
+  height    Int
+  position  Int
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, position])
+  @@map("recipe_images")
+}
+
+model Ingredient {
+  id       String   @id @default(uuid()) @db.Uuid
+  recipeId String   @map("recipe_id") @db.Uuid
+  name     String   @db.VarChar(120)
+  quantity Decimal? @db.Decimal(10, 2)
+  unit     String?  @db.VarChar(24)
+  position Int
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([recipeId, position])
+  @@map("ingredients")
+}
+
+model Instruction {
+  id         String @id @default(uuid()) @db.Uuid
+  recipeId   String @map("recipe_id") @db.Uuid
+  stepNumber Int    @map("step_number")
+  text       String
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, stepNumber])
+  @@map("instructions")
+}
+
+/// Imaginile urcate inainte de a exista reteta. Rezolva trei lucruri deodata:
+/// pastreaza dimensiunile, dovedeste cine detine cheia si permite stergerea orfanilor.
+model UploadedImage {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  objectKey  String    @unique @map("object_key")
+  width      Int
+  height     Int
+  consumedAt DateTime? @map("consumed_at") @db.Timestamptz(6)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([userId, consumedAt])
+  @@index([consumedAt, createdAt])
+  @@map("uploaded_images")
+}
+
+// ── Etapa 2: social ─────────────────────────────────────────────
+
+model RecipeLike {
+  userId    String   @map("user_id") @db.Uuid
+  recipeId  String   @map("recipe_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, recipeId])
+  @@index([recipeId])
+  @@map("recipe_likes")
+}
+
+model Comment {
+  id              String    @id @default(uuid()) @db.Uuid
+  recipeId        String    @map("recipe_id") @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  parentCommentId String?   @map("parent_comment_id") @db.Uuid
+  content         String    @db.VarChar(2000)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  recipe  Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  author  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([recipeId, createdAt(sort: Desc), id(sort: Desc)])
+  @@map("comments")
+}
+
+/// Fara CHECK(follower_id <> following_id) la nivel de DB - Prisma 5 nu il
+/// declara portabil; regula "nu te poti urmari singur" se aplica in serviciu.
+model Follow {
+  followerId  String   @map("follower_id") @db.Uuid
+  followingId String   @map("following_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  follower  User @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+  @@map("follows")
+}
+
+model SavedRecipe {
+  userId    String   @map("user_id") @db.Uuid
+  recipeId  String   @map("recipe_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, recipeId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("saved_recipes")
+}
+
+/// Categorie unica per reteta (nu many-to-many, cum a fost schitat initial in
+/// plan) - alegerea unei singure categorii e suficienta pentru descoperire si
+/// simplifica formularul de creare. Lista fixa e populata la pornirea aplicatiei.
+model Category {
+  id    Int    @id @default(autoincrement())
+  slug  String @unique @db.VarChar(40)
+  name  String @db.VarChar(60)
+  emoji String @db.VarChar(8)
+
+  recipes Recipe[]
+
+  @@map("categories")
+}
+
+model Notification {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  actorId   String    @map("actor_id") @db.Uuid
+  type      String    @db.VarChar(20)
+  recipeId  String?   @map("recipe_id") @db.Uuid
+  commentId String?   @map("comment_id") @db.Uuid
+  readAt    DateTime? @map("read_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  recipient User    @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  actor     User    @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+  recipe    Recipe? @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc), id(sort: Desc)])
+  @@map("notifications")
+}

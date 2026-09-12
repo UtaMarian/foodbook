@@ -1,0 +1,37 @@
+{
+  "name": "foodbook",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "shared",
+    "backend",
+    "mobile"
+  ],
+  "scripts": {
+    "build:shared": "npm run build -w @foodbook/shared",
+    "dev:api": "npm run start:dev -w @foodbook/backend",
+    "dev:mobile": "npm run start -w @foodbook/mobile",
+    "db:push": "npm run db:push -w @foodbook/backend",
+    "db:studio": "npm run db:studio -w @foodbook/backend",
+    "lint": "eslint backend/src backend/scripts shared/src mobile/app mobile/src",
+    "typecheck": "npm run build:shared && npm run typecheck -w @foodbook/backend && npm run typecheck -w @foodbook/mobile",
+    "build": "npm run build:shared && npm run build -w @foodbook/backend",
+    "test:e2e": "node backend/test/e2e.mjs",
+    "seed": "npm run seed -w @foodbook/backend"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "allowScripts": {
+    "prisma@5.22.0": true,
+    "@prisma/client@5.22.0": true,
+    "@prisma/engines@5.22.0": true,
+    "sharp@0.33.5": true
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "typescript-eslint": "^8.70.0"
+  }
+}

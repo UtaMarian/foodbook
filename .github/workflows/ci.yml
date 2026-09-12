@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # LTS, nu versiunea impara de pe masina de dezvoltare.
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Clientul Prisma e generat, nu versionat: fara el typecheck-ul pica.
+      - run: npm run db:generate -w @foodbook/backend
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/placeholder
+
+      - run: npm run lint
+
+      - run: npm run typecheck
+
+      - run: npm run build
+
+      # Bundle-ul mobil prinde importuri care trec de typecheck dar pica in Metro.
+      - run: npx expo export --platform android --output-dir /tmp/export
+        working-directory: mobile
