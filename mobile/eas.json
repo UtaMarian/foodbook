@@ -1,0 +1,20 @@
+{
+  "cli": {
+    "version": ">= 13.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": { "EXPO_PUBLIC_API_URL": "https://foodbook-api.onrender.com/v1" }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": { "EXPO_PUBLIC_API_URL": "https://foodbook-api.onrender.com/v1" }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
