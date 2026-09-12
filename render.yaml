@@ -4,8 +4,12 @@ services:
     runtime: node
     plan: free
     region: frankfurt
+    # --include=dev e necesar explicit: NODE_ENV=production (setat mai jos,
+    # activ si la build, nu doar la runtime) ar face npm sa omita
+    # devDependencies - inclusiv rimraf, typescript si prisma, de care
+    # build-ul are nevoie.
     buildCommand: >-
-      npm install &&
+      npm install --include=dev &&
       npm run build:shared &&
       npm run db:generate -w @foodbook/backend &&
       npx prisma migrate deploy --schema backend/prisma/schema.prisma &&
