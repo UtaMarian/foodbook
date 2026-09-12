@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: foodbook-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: >-
+      npm install &&
+      npm run build:shared &&
+      npm run db:generate -w @foodbook/backend &&
+      npx prisma migrate deploy --schema backend/prisma/schema.prisma &&
+      npm run build -w @foodbook/backend
+    startCommand: node backend/dist/main.js
+    healthCheckPath: /v1/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.11.0
+      - key: NODE_ENV
+        value: production
+      # PORT e setat automat de Render; main.ts il citeste din process.env.PORT.
+
+      # Secrete - completeaza-le manual din Render Dashboard (Environment),
+      # nu sunt scrise aici ca sa nu ajunga in git.
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+
+      # Valori implicite, neconfidentiale - editabile direct aici sau in dashboard.
+      - key: JWT_ACCESS_TTL
+        value: 15m
+      - key: JWT_REFRESH_TTL
+        value: 30d
+      - key: SUPABASE_BUCKET
+        value: foodbook-media
+      - key: MAX_IMAGE_BYTES
+        value: "8388608"

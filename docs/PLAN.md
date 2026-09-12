@@ -83,7 +83,7 @@ RetetaMea/
 - [ ] Al doilea branch DB pentru `dev`, separat de `main`
 - [x] Bucket `foodbook-media` pe Supabase Storage, public, creat automat la pornire (schimbat din planul inițial cu Cloudflare R2 — vezi nota de la finalul Etapei 2)
 - [x] Backend NestJS: config module, Prisma module, health check `/health`
-- [x] Expo app cu expo-router, splash screen, icon placeholder
+- [x] Expo app cu expo-router, splash screen, icon real (logo generat din `mobile/assets/logo_food.png` — vezi 2.7)
 - [x] CI GitHub Actions: lint + typecheck + build + bundle mobil la fiecare PR
 - [ ] Suita e2e în CI (cere DB și API pornit; deocamdată se rulează local cu `npm run test:e2e`)
 
@@ -358,7 +358,8 @@ Loading skeletons, empty states cu mesaj + acțiune, error states cu buton de re
 - **Storage mutat de la Cloudflare R2 la Supabase Storage** (decizie explicită, nu doar implementarea R2 amânată din 1.1): un singur provider de întreținut pentru storage, alături de baza de date Neon — mai puține conturi/secrete separate. Bucket-ul se creează automat, public, la pornirea backendului dacă nu există deja. Cheia folosită e cea „secret" (service role), nu „publishable" — backendul e de încredere și nu are nevoie de reguli RLS.
 - **EXIF/GPS confirmat eliminat**: pipeline-ul din Etapa 1 (Sharp, fără `withMetadata()`) elimina deja metadatele — verificat explicit acum cu o imagine de test cu bloc EXIF/GPS injectat manual.
 - **Rate limiting de bază** (`@nestjs/throttler`): plafon implicit 120 cereri/minut, plus limite specifice — 5 înregistrări/oră/IP, 10 rețete/zi/utilizator, 60 comentarii/oră/utilizator, 20 upload-uri/oră/utilizator (urmărite după utilizator autentificat, nu IP, ca să nu penalizeze o rețea partajată). Activ doar cu `NODE_ENV=production`, ca dezvoltarea locală și suita e2e să nu fie blocate de propriile limite.
-- **Backend găzduit pe Render, sursele pe GitHub** (`github.com/UtaMarian/foodbook`) — necesar pentru un deploy accesibil din afara rețelei locale, nu doar pentru dezvoltare.
+- **Backend găzduit pe Render, sursele pe GitHub** (`github.com/UtaMarian/foodbook`) — necesar pentru un deploy accesibil din afara rețelei locale, nu doar pentru dezvoltare. `render.yaml` la rădăcina repo descrie build-ul (Prisma generate + migrate deploy + tsc) ca Blueprint, gata de import în Render Dashboard.
+- **Iconițe/splash generate din logo-ul real** (`mobile/assets/logo_food.png`, decupat la simbolul carte+bonetă+tacâmuri, fără textul „cookfood" neclar din original) — înlocuiesc placeholder-ele din Etapa 1, pe fundalul crem al temei aplicației.
 
 ---
 

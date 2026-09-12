@@ -112,6 +112,10 @@ Plafon implicit de 120 cereri/minut pe toate rutele (protecție DoS generică), 
 
 Activ doar cu `NODE_ENV=production` (pe Render) — dezactivat implicit în dezvoltare, altfel suita e2e (care înregistrează câteva conturi la fiecare rulare) ar lovi pragul de înregistrări în cadrul aceleiași ore.
 
+## Deploy pe Render
+
+[render.yaml](render.yaml) la rădăcina repo-ului descrie un Blueprint: build-ul face `prisma generate` + `prisma migrate deploy` + `tsc`, iar pornirea rulează direct `backend/dist/main.js`. În Render Dashboard → New → Blueprint, alegi acest repo și completezi manual variabilele marcate `sync: false` (`DATABASE_URL`, `DIRECT_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`) — nu sunt scrise în fișier ca să nu ajungă în git. Restul (TTL-uri, numele bucket-ului, limita de imagine) au valori implicite editabile direct în `render.yaml`.
+
 ## Verificare
 
 ```bash
