@@ -47,3 +47,24 @@ services:
         value: foodbook-media
       - key: MAX_IMAGE_BYTES
         value: "8388608"
+
+  - type: web
+    name: foodbook-web
+    runtime: static
+    buildCommand: >-
+      npm install --include=dev &&
+      npm run build:shared &&
+      npm run build -w @foodbook/web
+    staticPublishPath: web/dist
+    # SPA client-side routing (React Router) - orice cale necunoscuta
+    # serverului static trebuie sa cada tot pe index.html.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      # Bakeuit in build de Vite - ajusteaza daca URL-ul real al
+      # serviciului foodbook-api difera (Render poate adauga un sufix
+      # daca numele nu e disponibil).
+      - key: VITE_API_URL
+        value: https://foodbook-api.onrender.com/v1
