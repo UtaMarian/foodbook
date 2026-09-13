@@ -23,7 +23,10 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundColor": "#FFF8F3"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -35,6 +38,12 @@
           "cameraPermission": "FoodBook are nevoie de camera ca sa poti fotografia preparatul."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "69bacbc6-454a-485b-afad-5a81826bdc03"
+      }
+    }
   }
 }

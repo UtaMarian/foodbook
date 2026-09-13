@@ -5,16 +5,18 @@
   "workspaces": [
     "shared",
     "backend",
-    "mobile"
+    "mobile",
+    "web"
   ],
   "scripts": {
     "build:shared": "npm run build -w @foodbook/shared",
     "dev:api": "npm run start:dev -w @foodbook/backend",
     "dev:mobile": "npm run start -w @foodbook/mobile",
+    "dev:web": "npm run dev -w @foodbook/web",
     "db:push": "npm run db:push -w @foodbook/backend",
     "db:studio": "npm run db:studio -w @foodbook/backend",
     "lint": "eslint backend/src backend/scripts shared/src mobile/app mobile/src",
-    "typecheck": "npm run build:shared && npm run typecheck -w @foodbook/backend && npm run typecheck -w @foodbook/mobile",
+    "typecheck": "npm run build:shared && npm run typecheck -w @foodbook/backend && npm run typecheck -w @foodbook/mobile && npm run typecheck -w @foodbook/web",
     "build": "npm run build:shared && npm run build -w @foodbook/backend",
     "test:e2e": "node backend/test/e2e.mjs",
     "seed": "npm run seed -w @foodbook/backend"
@@ -27,6 +29,10 @@
     "@prisma/client@5.22.0": true,
     "@prisma/engines@5.22.0": true,
     "sharp@0.33.5": true
+  },
+  "overrides": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
