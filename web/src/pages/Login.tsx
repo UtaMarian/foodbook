@@ -39,7 +39,7 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center p-6">
       <form onSubmit={submit} className="flex w-full max-w-sm flex-col gap-8">
         <div className="flex flex-col items-center gap-1">
-          <span className="text-6xl">🍳</span>
+          <img src="/icon.png" alt="" className="size-20" />
           <h1 className="text-3xl font-extrabold text-text">FoodBook</h1>
           <p className="text-center text-[15px] text-text-muted">Ce gătesc oamenii pe care îi urmărești</p>
         </div>

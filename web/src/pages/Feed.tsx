@@ -33,7 +33,10 @@ export default function Feed() {
   const header = (
     <div className="mb-4 flex flex-col gap-3 border-b border-border px-4 pb-4 pt-6">
       <div className="flex items-center justify-between">
-        <span className="text-[22px] font-extrabold text-text">🍳 FoodBook</span>
+        <span className="flex items-center gap-2 text-[22px] font-extrabold text-text">
+          <img src="/icon.png" alt="" className="size-7" />
+          FoodBook
+        </span>
         <NotificationBell
           size={40}
           count={unread.data?.count ?? 0}

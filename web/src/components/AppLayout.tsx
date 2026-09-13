@@ -14,8 +14,9 @@ export function AppLayout() {
   return (
     <div className="min-h-screen bg-bg text-text md:flex">
       <nav className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col gap-1 border-r border-border p-4 md:flex">
-        <NavLink to="/" className="mb-6 px-2 text-2xl font-extrabold text-text">
-          🍳 FoodBook
+        <NavLink to="/" className="mb-6 flex items-center gap-2 px-2 text-2xl font-extrabold text-text">
+          <img src="/icon.png" alt="" className="size-8" />
+          FoodBook
         </NavLink>
         {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
           <NavLink

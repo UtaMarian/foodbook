@@ -56,7 +56,7 @@ export default function Register() {
     <div className="flex min-h-screen items-center justify-center p-6">
       <form onSubmit={submit} className="flex w-full max-w-sm flex-col gap-6">
         <div className="flex flex-col items-center gap-1">
-          <span className="text-5xl">🍳</span>
+          <img src="/icon.png" alt="" className="size-16" />
           <h1 className="text-2xl font-extrabold text-text">Creează cont</h1>
         </div>
 
