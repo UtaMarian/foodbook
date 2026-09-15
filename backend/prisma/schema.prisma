@@ -11,14 +11,27 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
-  id           String  @id @default(uuid()) @db.Uuid
-  username     String  @unique @db.VarChar(24)
-  displayName  String  @map("display_name") @db.VarChar(60)
-  email        String  @unique @db.VarChar(254)
-  passwordHash String  @map("password_hash")
-  avatarKey    String? @map("avatar_key")
-  bio          String? @db.VarChar(300)
+  id           String     @id @default(uuid()) @db.Uuid
+  username     String     @unique @db.VarChar(24)
+  displayName  String     @map("display_name") @db.VarChar(60)
+  email        String     @unique @db.VarChar(254)
+  passwordHash String     @map("password_hash")
+  avatarKey    String?    @map("avatar_key")
+  bio          String?    @db.VarChar(300)
+  role         UserRole   @default(USER)
+  status       UserStatus @default(APPROVED)
 
   // contoare denormalizate - evita COUNT(*) per card in feed
   recipesCount   Int @default(0) @map("recipes_count")
@@ -38,7 +51,18 @@ model User {
   notifications Notification[] @relation("NotificationRecipient")
   actions       Notification[] @relation("NotificationActor")
 
+  @@index([status, createdAt(sort: Desc), id(sort: Desc)])
   @@map("users")
+}
+
+/// Setari globale ale aplicatiei, sub forma cheie-valoare - permite adaugarea
+/// de comutatoare noi din panoul admin fara migrari suplimentare.
+model AppSetting {
+  key       String   @id @db.VarChar(60)
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("app_settings")
 }
 
 model RefreshToken {

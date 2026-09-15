@@ -1,9 +1,13 @@
 import type {
+  AdminUserStatusFilter,
+  AdminUserSummary,
   AppNotification,
+  AppSettings,
   AuthTokens,
   AuthUser,
   Category,
   Comment,
+  CreateCategoryInput,
   CreateCommentInput,
   FeedScope,
   Page,
@@ -11,6 +15,8 @@ import type {
   RecipeDetail,
   RecipeSummary,
   CreateRecipeInput,
+  RegisterResult,
+  UpdateCategoryInput,
   UpdateProfileInput,
   UpdateRecipeInput,
 } from '@foodbook/shared';
@@ -153,7 +159,7 @@ const qs = (params: Record<string, string | number | undefined>) => {
 
 export const api = {
   register: (body: { username: string; displayName: string; email: string; password: string }) =>
-    request<{ user: AuthUser; tokens: AuthTokens }>('/auth/register', {
+    request<RegisterResult>('/auth/register', {
       method: 'POST',
       body,
       skipAuth: true,
@@ -239,4 +245,21 @@ export const api = {
     request<Page<AppNotification>>(`/notifications${qs({ cursor, limit })}`),
   unreadNotificationsCount: () => request<{ count: number }>('/notifications/unread-count'),
   markNotificationsRead: () => request<null>('/notifications/read', { method: 'POST' }),
+
+  adminSettings: () => request<AppSettings>('/admin/settings'),
+  updateAdminSettings: (body: AppSettings) =>
+    request<AppSettings>('/admin/settings', { method: 'PATCH', body }),
+  adminUsers: (status: AdminUserStatusFilter = 'all', cursor?: string, limit = 30) =>
+    request<Page<AdminUserSummary>>(`/admin/users${qs({ status, cursor, limit })}`),
+  approveUser: (id: string) =>
+    request<AdminUserSummary>(`/admin/users/${id}/approve`, { method: 'POST' }),
+  rejectUser: (id: string) =>
+    request<AdminUserSummary>(`/admin/users/${id}/reject`, { method: 'POST' }),
+
+  createCategory: (body: CreateCategoryInput) =>
+    request<Category>('/admin/categories', { method: 'POST', body }),
+  updateCategory: (slug: string, body: UpdateCategoryInput) =>
+    request<Category>(`/admin/categories/${slug}`, { method: 'PATCH', body }),
+  deleteCategory: (slug: string) =>
+    request<null>(`/admin/categories/${slug}`, { method: 'DELETE' }),
 };

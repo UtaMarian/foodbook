@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppLayout } from '@/components/AppLayout';
-import { AuthBootstrap, RequireAuth, RequireGuest } from '@/components/AuthGate';
+import { AuthBootstrap, RequireAdmin, RequireAuth, RequireGuest } from '@/components/AuthGate';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import Feed from '@/pages/Feed';
@@ -18,6 +18,7 @@ import UserProfile from '@/pages/UserProfile';
 import Followers from '@/pages/Followers';
 import Following from '@/pages/Following';
 import Notifications from '@/pages/Notifications';
+import AdminDashboard from '@/pages/AdminDashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +57,10 @@ export default function App() {
                 <Route path="user/:username" element={<UserProfile />} />
                 <Route path="user/:username/followers" element={<Followers />} />
                 <Route path="user/:username/following" element={<Following />} />
+
+                <Route element={<RequireAdmin />}>
+                  <Route path="admin" element={<AdminDashboard />} />
+                </Route>
               </Route>
             </Route>
           </Routes>

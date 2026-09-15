@@ -16,6 +16,8 @@ import { SocialModule } from './social/social.module';
 import { CategoriesModule } from './categories/categories.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SearchModule } from './search/search.module';
+import { SettingsModule } from './settings/settings.module';
+import { AdminModule } from './admin/admin.module';
 import { HealthController } from './health/health.controller';
 
 @Module({
@@ -35,6 +37,8 @@ import { HealthController } from './health/health.controller';
     CategoriesModule,
     NotificationsModule,
     SearchModule,
+    SettingsModule,
+    AdminModule,
   ],
   controllers: [HealthController],
   providers: [

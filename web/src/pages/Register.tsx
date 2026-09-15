@@ -16,6 +16,7 @@ export default function Register() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,7 +35,11 @@ export default function Register() {
     setLoading(true);
     try {
       const res = await api.register(parsed.data);
-      await signIn(res.user, res.tokens);
+      if (res.pending) {
+        setPending(true);
+      } else {
+        await signIn(res.user, res.tokens);
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 409 && err.message.includes('sername')) {
@@ -50,6 +55,24 @@ export default function Register() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (pending) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-6">
+        <div className="flex w-full max-w-sm flex-col items-center gap-4 text-center">
+          <span className="text-5xl">⏳</span>
+          <h1 className="text-2xl font-extrabold text-text">Cont creat</h1>
+          <p className="text-[15px] leading-6 text-text-muted">
+            Contul tău a fost creat și așteaptă aprobarea unui administrator. Vei putea intra în cont
+            de îndată ce este aprobat.
+          </p>
+          <Link to="/login" className="font-bold text-primary">
+            Înapoi la autentificare
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (

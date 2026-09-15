@@ -33,3 +33,9 @@ export function RequireGuest() {
   if (user) return <Navigate to="/" replace />;
   return <Outlet />;
 }
+
+export function RequireAdmin() {
+  const user = useAuth((s) => s.user);
+  if (user?.role !== 'admin') return <Navigate to="/" replace />;
+  return <Outlet />;
+}

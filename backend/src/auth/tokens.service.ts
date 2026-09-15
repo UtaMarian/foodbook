@@ -82,4 +82,12 @@ export class TokensService {
       data: { revokedAt: new Date() },
     });
   }
+
+  /** Foloseste la respingerea unui cont din panoul admin: taie orice sesiune activa. */
+  async revokeAllForUser(userId: string): Promise<void> {
+    await this.prisma.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+  }
 }

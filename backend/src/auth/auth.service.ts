@@ -1,9 +1,15 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { hash as argonHash, verify as argonVerify } from '@node-rs/argon2';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { TokensService } from './tokens.service';
 import { UsersService } from '../users/users.service';
-import type { AuthTokens, AuthUser, LoginInput, RegisterInput } from '@foodbook/shared';
+import { SettingsService } from '../settings/settings.service';
+import type { AuthTokens, AuthUser, LoginInput, RegisterInput, RegisterResult } from '@foodbook/shared';
 
 @Injectable()
 export class AuthService {
@@ -11,12 +17,10 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly tokens: TokensService,
     private readonly users: UsersService,
+    private readonly settings: SettingsService,
   ) {}
 
-  async register(
-    input: RegisterInput,
-    deviceInfo?: string,
-  ): Promise<{ user: AuthUser; tokens: AuthTokens }> {
+  async register(input: RegisterInput, deviceInfo?: string): Promise<RegisterResult> {
     const email = input.email.trim().toLowerCase();
     const username = input.username.trim().toLowerCase();
 
@@ -30,16 +34,22 @@ export class AuthService {
       );
     }
 
+    const requireApproval = await this.settings.getRequireApproval();
+
     const user = await this.prisma.user.create({
       data: {
         username,
         email,
         displayName: input.displayName.trim(),
         passwordHash: await argonHash(input.password),
+        status: requireApproval ? 'PENDING' : 'APPROVED',
       },
     });
 
+    if (requireApproval) return { pending: true };
+
     return {
+      pending: false,
       user: this.users.toAuthUser(user),
       tokens: await this.tokens.issue(user, deviceInfo),
     };
@@ -59,6 +69,15 @@ export class AuthService {
       throw invalid;
     }
     if (!(await argonVerify(user.passwordHash, input.password))) throw invalid;
+
+    // Statusul se verifica DUPA parola: cine nu stie parola nu trebuie sa
+    // afle daca acel cont e in asteptare/respins doar ghicind emailul.
+    if (user.status === 'PENDING') {
+      throw new ForbiddenException('Contul tau asteapta aprobare din partea unui administrator.');
+    }
+    if (user.status === 'REJECTED') {
+      throw new ForbiddenException('Contul tau a fost respins de un administrator.');
+    }
 
     return {
       user: this.users.toAuthUser(user),

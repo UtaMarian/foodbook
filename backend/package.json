@@ -13,7 +13,8 @@
     "db:migrate": "prisma migrate dev",
     "typecheck": "tsc --noEmit",
     "cleanup:orphans": "ts-node scripts/cleanup-orphans.ts",
-    "seed": "ts-node scripts/seed.ts"
+    "seed": "ts-node scripts/seed.ts",
+    "promote-admin": "ts-node scripts/promote-admin.ts"
   },
   "dependencies": {
     "@foodbook/shared": "*",

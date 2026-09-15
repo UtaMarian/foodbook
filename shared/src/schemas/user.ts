@@ -22,4 +22,5 @@ export interface PublicUser {
 
 export interface AuthUser extends PublicUser {
   email: string;
+  role: 'user' | 'admin';
 }

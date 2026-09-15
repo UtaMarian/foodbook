@@ -12,6 +12,7 @@ import type {
   RecipeDetail,
   RecipeSummary,
   CreateRecipeInput,
+  RegisterResult,
   UpdateProfileInput,
   UpdateRecipeInput,
 } from '@foodbook/shared';
@@ -161,7 +162,7 @@ const qs = (params: Record<string, string | number | undefined>) => {
 
 export const api = {
   register: (body: { username: string; displayName: string; email: string; password: string }) =>
-    request<{ user: AuthUser; tokens: AuthTokens }>('/auth/register', {
+    request<RegisterResult>('/auth/register', {
       method: 'POST',
       body,
       skipAuth: true,

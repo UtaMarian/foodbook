@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router';
-import { Home, Search, PlusCircle, Bookmark, User } from 'lucide-react';
+import { Home, Search, PlusCircle, Bookmark, User, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/store/auth';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Acasă', icon: Home, end: true },
@@ -10,7 +11,12 @@ const NAV_ITEMS = [
   { to: '/profile', label: 'Profil', icon: User, end: false },
 ];
 
+const ADMIN_NAV_ITEM = { to: '/admin', label: 'Admin', icon: ShieldCheck, end: false };
+
 export function AppLayout() {
+  const isAdmin = useAuth((s) => s.user?.role === 'admin');
+  const navItems = isAdmin ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
+
   return (
     <div className="min-h-screen bg-bg text-text md:flex">
       <nav className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col gap-1 border-r border-border p-4 md:flex">
@@ -18,7 +24,7 @@ export function AppLayout() {
           <img src="/icon.png" alt="" className="size-8" />
           FoodBook
         </NavLink>
-        {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
+        {navItems.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
@@ -43,7 +49,7 @@ export function AppLayout() {
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-surface md:hidden">
-        {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
+        {navItems.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}

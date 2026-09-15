@@ -29,7 +29,11 @@ export class UsersService {
   }
 
   toAuthUser(user: User): AuthUser {
-    return { ...this.toPublicUser(user, false), email: user.email };
+    return {
+      ...this.toPublicUser(user, false),
+      email: user.email,
+      role: user.role === 'ADMIN' ? 'admin' : 'user',
+    };
   }
 
   async getAuthUser(id: string): Promise<AuthUser> {

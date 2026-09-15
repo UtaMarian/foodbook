@@ -19,14 +19,16 @@ export class CategoriesService implements OnModuleInit {
   ) {}
 
   /**
-   * Lista fixa se populeaza singura la pornire, idempotent (upsert pe slug).
-   * Nu depindem de un script de seed separat rulat manual in productie.
+   * Lista fixa se populeaza singura la pornire, doar pentru categoriile
+   * care inca nu exista - nu suprascrie niciodata una existenta, ca un admin
+   * sa poata redenumi/schimba emoji-ul unei categorii din panou fara ca
+   * urmatorul restart al serverului sa ii anuleze modificarea.
    */
   async onModuleInit(): Promise<void> {
     for (const cat of DEFAULT_CATEGORIES) {
       await this.prisma.category.upsert({
         where: { slug: cat.slug },
-        update: { name: cat.name, emoji: cat.emoji },
+        update: {},
         create: cat,
       });
     }

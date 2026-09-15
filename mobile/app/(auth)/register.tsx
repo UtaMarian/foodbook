@@ -25,6 +25,7 @@ export default function Register() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState(false);
 
   async function submit() {
     setFormError(null);
@@ -44,7 +45,11 @@ export default function Register() {
     setLoading(true);
     try {
       const res = await api.register(parsed.data);
-      await signIn(res.user, res.tokens);
+      if (res.pending) {
+        setPending(true);
+      } else {
+        await signIn(res.user, res.tokens);
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         // 409 vine cu mesaj de conflict; il punem pe campul potrivit.
@@ -61,6 +66,27 @@ export default function Register() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (pending) {
+    return (
+      <Screen>
+        <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
+          <Text style={styles.logo}>⏳</Text>
+          <Text style={[styles.title, { color: c.text, textAlign: 'center' }]}>Cont creat</Text>
+          <Text style={{ color: c.textMuted, textAlign: 'center', marginTop: spacing.sm }}>
+            Contul tău a fost creat și așteaptă aprobarea unui administrator. Vei putea intra în
+            cont de îndată ce este aprobat.
+          </Text>
+          <Link
+            href="/login"
+            style={{ color: c.primary, fontWeight: '700', marginTop: spacing.lg }}
+          >
+            Înapoi la autentificare
+          </Link>
+        </View>
+      </Screen>
+    );
   }
 
   return (

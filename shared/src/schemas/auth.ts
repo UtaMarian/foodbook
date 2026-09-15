@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { AuthUser } from './user';
 
 export const usernameSchema = z
   .string()
@@ -33,3 +34,12 @@ export interface AuthTokens {
   refreshToken: string;
   expiresIn: number;
 }
+
+/**
+ * Inregistrarea poate crea direct un cont activ (tokens emisi) sau, cand
+ * poarta de aprobare e activa, un cont in asteptare - fara autentificare
+ * automata pana cand un admin il aproba.
+ */
+export type RegisterResult =
+  | { pending: true }
+  | { pending: false; user: AuthUser; tokens: AuthTokens };
