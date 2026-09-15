@@ -59,8 +59,11 @@ export default function Register() {
 
   if (pending) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-6">
-        <div className="flex w-full max-w-sm flex-col items-center gap-4 text-center">
+      <div
+        className="flex min-h-screen items-center justify-center bg-cover bg-center p-6"
+        style={{ backgroundImage: "url('/food.png')" }}
+      >
+        <div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-3xl bg-surface/95 p-8 text-center shadow-xl backdrop-blur-sm">
           <span className="text-5xl">⏳</span>
           <h1 className="text-2xl font-extrabold text-text">Cont creat</h1>
           <p className="text-[15px] leading-6 text-text-muted">
@@ -76,8 +79,14 @@ export default function Register() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
-      <form onSubmit={submit} className="flex w-full max-w-sm flex-col gap-6">
+    <div
+      className="flex min-h-screen items-center justify-center bg-cover bg-center p-6"
+      style={{ backgroundImage: "url('/food.png')" }}
+    >
+      <form
+        onSubmit={submit}
+        className="flex w-full max-w-sm flex-col gap-6 rounded-3xl bg-surface/95 p-8 shadow-xl backdrop-blur-sm"
+      >
         <div className="flex flex-col items-center gap-1">
           <img src="/icon.png" alt="" className="size-16" />
           <h1 className="text-2xl font-extrabold text-text">Creează cont</h1>

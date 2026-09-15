@@ -36,8 +36,14 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-6">
-      <form onSubmit={submit} className="flex w-full max-w-sm flex-col gap-8">
+    <div
+      className="flex min-h-screen items-center justify-center bg-cover bg-center p-6"
+      style={{ backgroundImage: "url('/food.png')" }}
+    >
+      <form
+        onSubmit={submit}
+        className="flex w-full max-w-sm flex-col gap-8 rounded-3xl bg-surface/95 p-8 shadow-xl backdrop-blur-sm"
+      >
         <div className="flex flex-col items-center gap-1">
           <img src="/icon.png" alt="" className="size-20" />
           <h1 className="text-3xl font-extrabold text-text">FoodBook</h1>
